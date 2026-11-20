@@ -1,0 +1,30 @@
+x-service: &service
+  build: &build
+    context: .
+  environment:
+    EUREKA_URL: http://eureka-server:8999/eureka/
+  depends_on:
+    - eureka-server
+  restart: unless-stopped
+
+services:
+  eureka-server:
+    build: { context: ., args: { MODULE: eureka-server } }
+    ports: ["8999:8999"]          # dashboard: http://localhost:8999
+
+  api-gateway:
+    <<: *service
+    build: { <<: *build, args: { MODULE: api-gateway } }
+    ports: ["9000:9000"]          # single entry point
+
+  user-service:
+    <<: *service
+    build: { <<: *build, args: { MODULE: user-service } }
+
+  post-service:
+    <<: *service
+    build: { <<: *build, args: { MODULE: post-service } }
+
+  notification-service:
+    <<: *service
+    build: { <<: *build, args: { MODULE: notification-service } }
